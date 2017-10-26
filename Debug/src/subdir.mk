@@ -4,12 +4,15 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../src/Client.c \
 ../src/TTK4147-Project.c 
 
 OBJS += \
+./src/Client.o \
 ./src/TTK4147-Project.o 
 
 C_DEPS += \
+./src/Client.d \
 ./src/TTK4147-Project.d 
 
 
