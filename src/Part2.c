@@ -18,7 +18,7 @@
 #include "Client.h"
 
 
-int main_part_2(void) {
+void main_part_2(void) {
 	printf("----- TTK4147 Project ------ \n");
 	printf("---------- PART 2 ---------- \n");
 

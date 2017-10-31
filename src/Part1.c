@@ -18,7 +18,7 @@
 
 struct timespec program_sleep;
 
-int main_part_1(void) {
+void main_part_1(void) {
 
 	printf("----- TTK4147 Project ------ \n");
 	printf("---------- PART 1 ---------- \n");
