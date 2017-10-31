@@ -12,35 +12,15 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include "Shared.h"
-#include "Client.h"
 #include <string.h>
+#include "Client.h"
+#include "Shared.h"
+#include "Part1.h"
+#include "Part2.h"
 
 //Variables
 struct udp_conn connection;
-float integral = 0.0;
 char *ip = IP;
-
-void regulator(float reference){
-
-	float error = reference - get_y();
-	integral = integral + (error * SLEEP_PERIOD / MILLISEC_TO_SEC);
-	float u = KP * error + KI * integral;
-
-	set_u(u);
-
-}
-
-float get_y(){
-
-	char get_command[] = "GET";
-	udp_send(&connection, get_command, sizeof(get_command));
-
-	char buffer[25];
-	udp_receive(&connection, buffer, sizeof(buffer)+1);
-
-	return atof(buffer + sizeof("ACKOF: "));
-}
 
 void set_u(float input){
 
@@ -50,7 +30,7 @@ void set_u(float input){
 	sprintf(str_input, "%s%f", set_command, input);
 
 	udp_send(&connection, str_input, sizeof(str_input));
-	//printf("Output %f, input %f, str_input %s \n", get_y(), input, str_input);
+	printf("Output %f, input %f \n", get_y(&connection), input);
 
 }
 
@@ -75,10 +55,10 @@ int main ( int argc, char *argv[] )
 	start_server();
 
 	if(!strcmp(argv[1], "-part1")) {
-			main_part_1();
+			part_1_main(&connection);
 	}
 	else if(!strcmp(argv[1], "-part2")) {
-			main_part_2();
+			part_2_main(&connection);
 	}
 	else{
 		printf("Illegal argument, expected: -part1 or -part2 \n");

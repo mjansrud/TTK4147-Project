@@ -1,8 +1,6 @@
 #ifndef SHARED_H_
 #define SHARED_H_
 
-float get_y();
-void regulator(float reference);
 void set_u(float input);
 void start_server();
 void stop_server();
