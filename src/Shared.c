@@ -54,7 +54,10 @@ int main ( int argc, char *argv[] )
 	udp_init_client(&connection, PORT, ip);
 	start_server();
 
-	if(!strcmp(argv[1], "-part1")) {
+	if(argv[1] == NULL){
+		printf("Please choose -part1 or -part2 \n");
+	}
+	else if(!strcmp(argv[1], "-part1")) {
 			part_1_main(&connection);
 	}
 	else if(!strcmp(argv[1], "-part2")) {
