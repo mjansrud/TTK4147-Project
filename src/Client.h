@@ -10,7 +10,7 @@ float get_u(float y);
 
 //Timing
 static const float MILLISEC_TO_SEC = 1000000.0;
-static const int SLEEP_PERIOD = 2200;				//In microseconds
+static const int SLEEP_PERIOD = 2000;				//In microseconds
 static const int RUN_PERIOD = 500000; 				//In microseconds
 
 //Regulator
