@@ -1,10 +1,10 @@
 /*
  ============================================================================
- Name        : TTK4147-Project.c
- Author      : 
- Version     :
- Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Name        : Part1.c
+ Author      : Morten Jansrud & Øystein Brox
+ Version     : 99992.903.141
+ Copyright   : Kjør på!
+ Description : Simulation of a dynamical system in real-time that must be controlled - Part 1
  ============================================================================
  */
 
