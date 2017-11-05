@@ -1,88 +1,106 @@
+/*
+ ============================================================================
+ Name        : TTK4147-Project.c
+ Author      : 
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <arpa/inet.h>
 #include <time.h>
-#include <signal.h>
-
+#include <string.h>
+#include "Miniproject.h"
 #include "Client.h"
+#include "Part1.h"
+#include "Part2.h"
 
-int udp_init_client(struct udp_conn *udp, int port, char *ip)
-{
-	struct hostent *host;
+//Variables
+pthread_mutex_t mutex_sender;
+struct udp_conn connection;
+float integral = 0.0;
+char *ip = IP;
 
-	if ((host = gethostbyname(ip)) == NULL) return -1;
+int main ( int argc, char *argv[] ){
 
-	udp->client_len = sizeof(udp->client);
-	// define servers
-	memset((char *)&(udp->server), 0, sizeof(udp->server));
-	udp->server.sin_family = AF_INET;
-	udp->server.sin_port = htons(port);
-	bcopy((char *)host->h_addr, (char *)&(udp->server).sin_addr.s_addr, host->h_length);
+	printf("------ TTK4147 Project ------ \n");
+	start_server();
 
-	// open socket
-	if ((udp->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) return udp->sock;
+	//Only one thread may send packets at the same time
+	pthread_mutex_init(&mutex_sender, NULL);
 
-	return 0;
-}
-
-int udp_send(struct udp_conn *udp, char *buf, int len)
-{
-	return sendto(udp->sock, buf, len, 0, (struct sockaddr *)&(udp->server), sizeof(udp->server));
-}
-
-int udp_receive(struct udp_conn *udp, char *buf, int len)
-{
-	int res = recvfrom(udp->sock, buf, len, 0, (struct sockaddr *)&(udp->client), &(udp->client_len));
-
-	return res;
-}
-
-void udp_close(struct udp_conn *udp)
-{
-	close(udp->sock);
-	return;
-}
-
-int clock_nanosleep(struct timespec *next)
-{
-	struct timespec now;
-	struct timespec sleep;
-
-	// get current time
-	clock_gettime(CLOCK_REALTIME, &now);
-
-	// find the time the function should sleep
-	sleep.tv_sec = next->tv_sec - now.tv_sec;
-	sleep.tv_nsec = next->tv_nsec - now.tv_nsec;
-
-	// if the nanosecon is below zero, decrement the seconds
-	if (sleep.tv_nsec < 0)
-	{
-		sleep.tv_nsec += 1000000000;
-		sleep.tv_sec -= 1;
+	if(argv[1] == NULL){
+		printf("Please choose -part1 or -part2 \n");
+	}
+	else if(!strcmp(argv[1], "-part1")) {
+			part_1(&connection);
+	}
+	else if(!strcmp(argv[1], "-part2")) {
+			part_2(&connection);
+	}
+	else{
+		printf("Illegal argument, expected: -part1 or -part2 \n");
 	}
 
-	// sleep
-	nanosleep(&sleep, NULL);
+	stop_server();
+	printf("----- Stopping program ----- \n");
+	return EXIT_SUCCESS;
 
-	return 0;
 }
 
-void timespec_add_us(struct timespec *t, long us)
-{
-	// add microseconds to timespecs nanosecond counter
-	t->tv_nsec += us*1000;
+/*
+ *  Shared functions for part 1 and part 2
+ */
 
-	// if wrapping nanosecond counter, increment second counter
-	if (t->tv_nsec > 1000000000)
-	{
-		t->tv_nsec -= 1000000000;
-		t->tv_sec += 1;
-	}
+void send_message(char *message, int length){
+
+	pthread_mutex_lock(&mutex_sender);
+	udp_send(&connection, message, length);
+	pthread_mutex_unlock(&mutex_sender);
+
+}
+
+void start_server(){
+
+	char start_command[] = "START";
+	udp_init_client(&connection, PORT, ip);
+	send_message(start_command, sizeof(start_command));
+
+}
+
+void stop_server(){
+
+	char stop_command[] = "STOP";
+	send_message(stop_command, sizeof(stop_command));
+	udp_close(&connection);
+
+}
+
+void request_y(){
+
+	char get_command[] = "GET";
+	send_message(get_command, sizeof(get_command));
+
+}
+
+void set_u(float input){
+
+	char set_command[] = "SET:";
+
+	char str_input[sizeof(set_command) + sizeof(input)];
+	sprintf(str_input, "%s%f", set_command, input);
+
+	send_message(str_input, sizeof(str_input));
+
+}
+
+float get_u(float y){
+
+	float error = reference - y;
+	integral = integral + (error * SLEEP_PERIOD / MILLISEC_TO_SEC);
+	return KP * error + KI * integral;
+
 }
