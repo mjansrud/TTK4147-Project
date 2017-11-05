@@ -30,16 +30,16 @@ void part_2(struct udp_conn *connection){
 	sem_init(&sem_signal, 0, 1);
 	pthread_mutex_init(&mutex_y, NULL);
 
-    pthread_t thread_receiver;
-    pthread_t thread_controller;
-    pthread_t thread_acknowledger;
+	pthread_t thread_receiver;
+	pthread_t thread_controller;
+	pthread_t thread_acknowledger;
 
-    pthread_create(&thread_receiver,  NULL, receiver, connection);
-    pthread_create(&thread_controller, NULL, controller, connection);
-    pthread_create(&thread_acknowledger,   NULL, acknowledger, connection);
+	pthread_create(&thread_receiver,  NULL, receiver, connection);
+	pthread_create(&thread_controller, NULL, controller, connection);
+	pthread_create(&thread_acknowledger,   NULL, acknowledger, connection);
 
-    //Exit program when controller is finished
-    pthread_join(thread_controller, NULL);
+	//Exit program when controller is finished
+	pthread_join(thread_controller, NULL);
 
 }
 
